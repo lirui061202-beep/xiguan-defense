@@ -8,6 +8,7 @@
   :root { --hud:#f2ede4; --warn:#ff5a3c; --amber:#ffb23c; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #0c0a09; font-family: "Bahnschrift", "DIN Alternate", "Microsoft YaHei", "PingFang SC", sans-serif; color: var(--hud); user-select: none; }
+  #stage { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; transform-origin: 0 0; overflow: hidden; }
   canvas#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
   .kai { font-family: "KaiTi", "STKaiti", "楷体", serif; }
   #hud { position: fixed; inset: 0; pointer-events: none; display: none; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
@@ -70,14 +71,13 @@
   #touch [data-b=reload] { right: calc(max(26px, env(safe-area-inset-right)) + 182px); bottom: 26px; width: 52px; height: 52px; }
   #touch [data-b=pound] { right: calc(max(26px, env(safe-area-inset-right)) + 86px); bottom: 186px; width: 48px; height: 48px; }
   #touch [data-b=pause] { right: 50%; margin-right: -150px; top: 10px; width: 38px; height: 38px; border-radius: 8px; }
-  #rotate { position: fixed; inset: 0; z-index: 9; display: none; align-items: center; justify-content: center; background: #0c0a09; font-size: 18px; letter-spacing: 6px; }
   body.mobile #keys, body.mobile .grid { display: none; }
   body.mobile #hp { left: 16px; top: 64px; bottom: auto; } body.mobile #hp .n { font-size: 28px; } body.mobile #hp .bar { width: 110px; }
   body.mobile #ammo { right: 16px; top: 62px; bottom: auto; } body.mobile #ammo .n { font-size: 34px; } body.mobile #ammo .w { display: none; }
   body.mobile #obj { left: 16px; top: 12px; font-size: 11px; } body.mobile #score { right: 16px; top: 10px; } body.mobile #score .n { font-size: 18px; } body.mobile #feed { top: 110px; right: 16px; font-size: 11px; }
   body.mobile #wave { top: 10px; font-size: 11px; } body.mobile #wave .n { font-size: 16px; } body.mobile #wave .bar { width: 150px; }
   body.mobile #toast { font-size: 22px; letter-spacing: 6px; } body.mobile #toast.on { letter-spacing: 8px; }
-  body.mobile h1 { font-size: 54px; letter-spacing: 6px; } body.mobile .story { font-size: 13px; margin-bottom: 12px; } body.mobile .sub { margin-bottom: 10px; } body.mobile .overlay { padding: 4vh 5vw; }
+  body.mobile h1 { font-size: 54px; letter-spacing: 6px; } body.mobile .story { font-size: 13px; margin-bottom: 12px; } body.mobile .sub { margin-bottom: 10px; } body.mobile .overlay { padding: 14px 24px; }
   .mhint { display: none; font-size: 12px; letter-spacing: 1px; opacity: .85; margin: 0 0 16px; line-height: 1.8; } body.mobile .mhint { display: block; }
   #end .res { font-size: 15px; line-height: 2.1; margin: 10px 0 22px; letter-spacing: 2px; } #end .res b { font-size: 22px; color: var(--amber); margin-left: 8px; }
   #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: #0c0a09; letter-spacing: 6px; font-size: 13px; }
@@ -89,6 +89,7 @@
 </script>
 </head>
 <body>
+<div id="stage">
 <canvas id="c"></canvas>
 
 <div id="hud">
@@ -106,7 +107,6 @@
   <div id="keys"><kbd>左键</kbd>射击 <kbd>右键</kbd>瞄准 <kbd>R</kbd>换弹 <kbd>Shift</kbd>冲刺 <kbd>空格</kbd>二段跳 <kbd>C</kbd>下砸 <kbd>G</kbd>画质 <kbd>M</kbd>静音</div>
 </div>
 <div id="touch"><div id="stick"><i></i></div><button data-b="fire">射击</button><button data-b="ads">瞄准</button><button data-b="jump">跳</button><button data-b="dash">冲</button><button data-b="reload">换弹</button><button data-b="pound">砸</button><button data-b="pause">Ⅱ</button></div>
-<div id="rotate">请把手机横过来</div>
 <div id="fade"></div>
 
 <div id="title" class="overlay">
@@ -148,6 +148,21 @@
 
 <div id="loading"><div id="loadTxt">载入西关 0%</div><div class="bar"><i id="loadBar"></i></div></div>
 
+</div>
+<script>
+  // 自适应旋转：手机竖着拿时把整个画面转 90° 铺满屏幕；横过来（或系统自动旋转）就恢复正常
+  (function () {
+    var st = document.getElementById('stage');
+    var mobile = new URLSearchParams(location.search).has('mobile') || (matchMedia('(pointer: coarse)').matches && 'ontouchstart' in window);
+    function fit() {
+      var w = innerWidth, h = innerHeight, rot = mobile && h > w;
+      window.__rot = rot; window.__vw = rot ? h : w; window.__vh = rot ? w : h;
+      st.style.width = window.__vw + 'px'; st.style.height = window.__vh + 'px';
+      st.style.transform = rot ? 'translateX(' + w + 'px) rotate(90deg)' : '';
+    }
+    addEventListener('resize', fit); addEventListener('orientationchange', function () { setTimeout(fit, 60); }); fit();
+  })();
+</script>
 <script type="module">
   // 本机开发直接跑源码；线上（或加 ?dist）跑打包后的单文件，少几十次网络往返
   const dev = /^(localhost|127.0.0.1)$/.test(location.hostname) && !new URLSearchParams(location.search).has('dist');

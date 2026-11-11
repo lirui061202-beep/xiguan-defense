@@ -47,10 +47,9 @@ const post = makePost(renderer, scene, camera, sun, { scene: overlayScene, camer
 const refl = makeReflection(renderer, scene, camera); world.refl.tRefl.value = refl.texture; world.refl.reflMatrix.value = refl.matrix;
 let quality = Q.has('q') ? +Q.get('q') : (MOBILE ? 0 : 2); post.setQuality(quality);
 function resize() {
-  const w = innerWidth, h = innerHeight, pr = Math.min(devicePixelRatio || 1, MOBILE ? 1.5 : quality >= 2 ? 1.5 : quality === 1 ? 1.25 : 1);
+  const w = window.__vw || innerWidth, h = window.__vh || innerHeight, pr = Math.min(devicePixelRatio || 1, MOBILE ? 1.5 : quality >= 2 ? 1.5 : quality === 1 ? 1.25 : 1);
   renderer.setPixelRatio(1); renderer.setSize(w * pr, h * pr, false); post.setSize(Math.round(w * pr), Math.round(h * pr)); refl.setSize(Math.round(w * pr), Math.round(h * pr));
-  camera.aspect = overlayCam.aspect = w / h; camera.updateProjectionMatrix(); overlayCam.updateProjectionMatrix();
-  $('rotate').style.display = MOBILE && h > w ? 'flex' : 'none'; fx.pmat.uniforms.scale.value = h * pr * 0.75;
+  camera.aspect = overlayCam.aspect = w / h; camera.updateProjectionMatrix(); overlayCam.updateProjectionMatrix(); fx.pmat.uniforms.scale.value = h * pr * 0.75;
 }
 addEventListener('resize', resize); resize();
 
@@ -202,6 +201,7 @@ document.addEventListener('pointerlockchange', () => { if (!locked() && S.mode =
 const TS = { stick: null, look: new Map(), mv: { x: 0, y: 0 }, btn: {}, edge: {}, adsOn: false };
 if (MOBILE) {
   const pad = $('touch'), knob = $('stick'), R = 58;
+  const P = (t) => (window.__rot ? { x: t.clientY, y: innerWidth - t.clientX } : { x: t.clientX, y: t.clientY }); // 屏幕坐标 → 画面坐标
   pad.addEventListener('touchstart', (e) => {
     e.preventDefault(); if (S.mode !== 'play') return;
     for (const t of e.changedTouches) {
@@ -209,16 +209,16 @@ if (MOBILE) {
       if (el) {
         const b = el.dataset.b; if (b === 'pause') { setMode('pause'); continue; }
         if (b === 'ads') { TS.adsOn = !TS.adsOn; el.classList.toggle('on', TS.adsOn); } else { TS.btn[b] = true; TS.edge[b] = true; el.classList.add('on'); }
-        TS.look.set(t.identifier, { x: t.clientX, y: t.clientY, b, el }); // 按着按钮也能拖动瞄准
-      } else if (t.clientX < innerWidth * 0.42 && !TS.stick) { TS.stick = { id: t.identifier, x0: t.clientX, y0: t.clientY }; knob.style.display = 'block'; knob.style.left = t.clientX + 'px'; knob.style.top = t.clientY + 'px'; knob.firstElementChild.style.transform = ''; }
-      else TS.look.set(t.identifier, { x: t.clientX, y: t.clientY });
+        const p = P(t); TS.look.set(t.identifier, { x: p.x, y: p.y, b, el }); // 按着按钮也能拖动瞄准
+      } else { const p = P(t); if (p.x < (window.__vw || innerWidth) * 0.42 && !TS.stick) { TS.stick = { id: t.identifier, x0: p.x, y0: p.y }; knob.style.display = 'block'; knob.style.left = p.x + 'px'; knob.style.top = p.y + 'px'; knob.firstElementChild.style.transform = ''; } else TS.look.set(t.identifier, { x: p.x, y: p.y }); }
     }
   }, { passive: false });
   pad.addEventListener('touchmove', (e) => {
     e.preventDefault();
     for (const t of e.changedTouches) {
-      if (TS.stick && t.identifier === TS.stick.id) { let dx = (t.clientX - TS.stick.x0) / R, dy = (t.clientY - TS.stick.y0) / R; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } TS.mv.x = dx; TS.mv.y = dy; knob.firstElementChild.style.transform = `translate(${dx * R}px,${dy * R}px)`; }
-      else { const l = TS.look.get(t.identifier); if (l) { mdx += (t.clientX - l.x) * 2.6; mdy += (t.clientY - l.y) * 2.6; l.x = t.clientX; l.y = t.clientY; } }
+      const p = P(t);
+      if (TS.stick && t.identifier === TS.stick.id) { let dx = (p.x - TS.stick.x0) / R, dy = (p.y - TS.stick.y0) / R; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } TS.mv.x = dx; TS.mv.y = dy; knob.firstElementChild.style.transform = `translate(${dx * R}px,${dy * R}px)`; }
+      else { const l = TS.look.get(t.identifier); if (l) { mdx += (p.x - l.x) * 2.6; mdy += (p.y - l.y) * 2.6; l.x = p.x; l.y = p.y; } }
     }
   }, { passive: false });
   const end = (e) => { e.preventDefault(); for (const t of e.changedTouches) { if (TS.stick && t.identifier === TS.stick.id) { TS.stick = null; TS.mv.x = TS.mv.y = 0; knob.style.display = 'none'; } else { const l = TS.look.get(t.identifier); if (l) { if (l.b && l.b !== 'ads') { TS.btn[l.b] = false; l.el.classList.remove('on'); } TS.look.delete(t.identifier); } } } };
