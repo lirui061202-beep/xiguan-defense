@@ -575,6 +575,7 @@ export function buildCity(scene, tex) {
     const p = paths[i % paths.length], c = { p, t: rnd() * p.total, v: rr(8, 12.5) };
     cars.push(c); carsA.setColorAt(i, C.set(pick(CAR_COLORS)));
   }
+  paths.forEach((p, pi) => { const list = [...cars.filter((c) => c.p === p), ...buses.filter((b) => b.p === p)].sort(() => rnd() - 0.5), v = 8 + (pi % 3) * 0.8; list.forEach((o, k) => { o.t = (k + rr(0.15, 0.45)) * p.total / list.length; o.v = v; }); });
   const cm = new THREE.Matrix4(), cq = new THREE.Quaternion(), UP = V3(0, 1, 0), ONE = V3(1, 1, 1);
   const moveCars = (dt) => {
     for (let i = 0; i < NC; i++) {

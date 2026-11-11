@@ -306,14 +306,20 @@ const prof = (pts, width, bevel = 0.07) => {
 };
 export function carGeos() {
   const body = mergeGeometries([
-    prof([[-2.2, 0.34], [-2.24, 0.78], [-1.9, 0.9], [-1.2, 0.93], [1.0, 0.9], [1.9, 0.8], [2.26, 0.66], [2.24, 0.34]], 1.84),
-    prof([[-0.95, 1.4], [0.45, 1.4], [0.5, 1.46], [-1.0, 1.46]], 1.5, 0.04),
+    prof([[-2.18, 0.4], [-2.27, 0.6], [-2.22, 0.8], [-1.98, 0.9], [-1.35, 0.95], [0.95, 0.93], [1.55, 0.87], [2.02, 0.77], [2.27, 0.62], [2.24, 0.4]], 1.84, 0.13),
+    prof([[-1.0, 1.4], [0.48, 1.4], [0.56, 1.455], [-1.08, 1.455]], 1.46, 0.05),
+    prof([[-1.72, 0.93], [-1.62, 0.93], [-1.0, 1.42], [-1.1, 1.42]], 1.6, 0.03), prof([[1.2, 0.93], [1.32, 0.93], [0.56, 1.42], [0.46, 1.42]], 1.6, 0.03),
+    prof([[-0.32, 0.93], [-0.2, 0.93], [-0.2, 1.42], [-0.32, 1.42]], 1.64, 0.02),
   ]);
-  const wheel = new THREE.CylinderGeometry(0.34, 0.34, 0.26, 14).rotateZ(Math.PI / 2), hub = new THREE.CylinderGeometry(0.19, 0.19, 0.28, 10).rotateZ(Math.PI / 2);
-  const parts = [tintG(prof([[-1.62, 0.9], [-1.02, 1.42], [0.5, 1.42], [1.22, 0.9]], 1.66, 0.05), '#182230')];
-  for (const [wx, wz] of [[-0.84, 1.42], [0.84, 1.42], [-0.84, -1.42], [0.84, -1.42]]) { parts.push(tintG(wheel.clone().translate(wx, 0.34, wz), '#14171b')); parts.push(tintG(hub.clone().translate(wx, 0.34, wz), '#c9ced6')); }
-  for (const sx of [-0.62, 0.62]) { parts.push(tintG(new THREE.BoxGeometry(0.44, 0.13, 0.08).translate(sx, 0.7, 2.24), '#fffbe6')); parts.push(tintG(new THREE.BoxGeometry(0.44, 0.11, 0.08).translate(sx, 0.76, -2.23), '#ff4a3d')); }
-  parts.push(tintG(new THREE.BoxGeometry(1.2, 0.16, 0.06).translate(0, 0.5, 2.25), '#20252c'));
+  const wheel = new THREE.CylinderGeometry(0.34, 0.34, 0.26, 16).rotateZ(Math.PI / 2), hub = new THREE.CylinderGeometry(0.2, 0.2, 0.28, 10).rotateZ(Math.PI / 2);
+  const parts = [tintG(prof([[-1.66, 0.92], [-1.04, 1.41], [0.5, 1.41], [1.25, 0.92]], 1.58, 0.04), '#141c26')];
+  for (const [wx, wz] of [[-0.82, 1.42], [0.82, 1.42], [-0.82, -1.42], [0.82, -1.42]]) { parts.push(tintG(wheel.clone().translate(wx, 0.34, wz), '#121416')); parts.push(tintG(hub.clone().translate(wx, 0.34, wz), '#b9bec6')); }
+  for (const wz of [1.42, -1.42]) parts.push(tintG(new THREE.BoxGeometry(1.87, 0.46, 0.9).translate(0, 0.52, wz), '#16191d'));                 // 轮拱
+  parts.push(tintG(new THREE.BoxGeometry(1.87, 0.12, 1.9).translate(0, 0.4, 0), '#1a1d21'));                                                  // 裙边
+  for (const sz of [2.27, -2.27]) parts.push(tintG(new THREE.BoxGeometry(1.8, 0.2, 0.1).translate(0, 0.46, sz), '#1a1d21'));                  // 保险杠
+  for (const sx of [-0.99, 0.99]) parts.push(tintG(new THREE.BoxGeometry(0.16, 0.1, 0.2).translate(sx, 1.0, 0.82), '#1a1d21'));               // 后视镜
+  for (const sx of [-0.62, 0.62]) { parts.push(tintG(new THREE.BoxGeometry(0.46, 0.12, 0.08).translate(sx, 0.72, 2.25), '#fffbe6')); parts.push(tintG(new THREE.BoxGeometry(0.46, 0.1, 0.08).translate(sx, 0.78, -2.24), '#e23a2e')); }
+  parts.push(tintG(new THREE.BoxGeometry(1.0, 0.14, 0.06).translate(0, 0.62, 2.27), '#20252c')); parts.push(tintG(new THREE.BoxGeometry(0.44, 0.13, 0.03).translate(0, 0.48, 2.33), '#2a5fc0')); parts.push(tintG(new THREE.BoxGeometry(0.44, 0.13, 0.03).translate(0, 0.6, -2.33), '#2a5fc0'));
   return { body, detail: mergeGeometries(parts) };
 }
 export function busGeos() {
