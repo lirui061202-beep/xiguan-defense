@@ -23,7 +23,8 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(76, 1, 0.04, 3000); scene.add(camera);
 
 // ---------- 资源、天空、环境光 ----------
-const A = await loadAssets({ lite: MOBILE });
+const A = await loadAssets({ lite: MOBILE, renderer }, (d, n) => { const p = Math.round((d / n) * 100); $('loadTxt').textContent = `载入西关 ${p}%`; $('loadBar').style.width = p + '%'; });
+$('loadTxt').textContent = '搭建街道 …'; await new Promise((r) => setTimeout(r, 30)); // 让文字先画出来
 const sky = A.sky(SUN_DIR, 14);
 { const h = sky.horizon, l = h.r * 0.3 + h.g * 0.55 + h.b * 0.15, f = (v) => Math.pow(l + (v - l) * 0.85, 1.12) * 1.9 * 0.9; sky.horizon = new THREE.Color(f(h.r), f(h.g), f(h.b)); } // 与天穹着色器同一套增益，地平线和雾才接得上
 const FOG_D = 0.0058;

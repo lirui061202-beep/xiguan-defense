@@ -81,7 +81,7 @@
   .mhint { display: none; font-size: 12px; letter-spacing: 1px; opacity: .85; margin: 0 0 16px; line-height: 1.8; } body.mobile .mhint { display: block; }
   #end .res { font-size: 15px; line-height: 2.1; margin: 10px 0 22px; letter-spacing: 2px; } #end .res b { font-size: 22px; color: var(--amber); margin-left: 8px; }
   #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: #0c0a09; letter-spacing: 6px; font-size: 13px; }
-  #loading .bar { width: 240px; height: 2px; background: rgba(255,255,255,.15); overflow: hidden; } #loading .bar i { display: block; width: 40%; height: 100%; background: var(--amber); animation: ld 1.1s infinite ease-in-out; }
+  #loading .bar { width: 240px; height: 2px; background: rgba(255,255,255,.15); overflow: hidden; } #loading .bar i { display: block; width: 0; height: 100%; background: var(--amber); transition: width .15s; }
   @keyframes ld { 0% { transform: translateX(-100%); } 100% { transform: translateX(260%); } }
 </style>
 <script type="importmap">
@@ -146,7 +146,7 @@
   </div>
 </div>
 
-<div id="loading"><div>载入西关 …</div><div class="bar"><i></i></div></div>
+<div id="loading"><div id="loadTxt">载入西关 0%</div><div class="bar"><i id="loadBar"></i></div></div>
 
 <script type="module" src="./src/main.js"></script>
 </body>
