@@ -1,1 +1,15 @@
-{"name":"guangzhou-yumcha","private":true,"version":"0.1.0","dependencies":{"three":"^0.160.0"}}
+{
+  "name": "guangzhou-yumcha",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "build": "esbuild src/main.js --bundle --format=esm --target=es2022 --minify --outfile=dist/game.js"
+  }
+}

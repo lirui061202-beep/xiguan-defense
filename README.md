@@ -8,3 +8,5 @@
 本地运行：`node server.js`，然后打开 http://localhost:5199 。
 
 贴图和持枪画面为 AI 生成图片，模型与特效为程序化生成。
+
+改完代码要发布时：先 `npm run build`（把 src 打包成 dist/game.js，线上跑的是它），再提交推送。新增或替换素材后，在本地页面控制台跑 `tools/bake.js`（见文件头说明）重新生成 assets/web。

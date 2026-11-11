@@ -148,6 +148,10 @@
 
 <div id="loading"><div id="loadTxt">载入西关 0%</div><div class="bar"><i id="loadBar"></i></div></div>
 
-<script type="module" src="./src/main.js"></script>
+<script type="module">
+  // 本机开发直接跑源码；线上（或加 ?dist）跑打包后的单文件，少几十次网络往返
+  const dev = /^(localhost|127.0.0.1)$/.test(location.hostname) && !new URLSearchParams(location.search).has('dist');
+  import(dev ? './src/main.js' : './dist/game.js');
+</script>
 </body>
 </html>
