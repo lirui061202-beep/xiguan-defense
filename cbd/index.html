@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>花城漫步 · 珠江新城</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #bfe0f7; font-family: "Bahnschrift", "DIN Alternate", "Microsoft YaHei", "PingFang SC", sans-serif; color: #fff; user-select: none; -webkit-user-select: none; touch-action: none; }
+  canvas#c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #hud { position: fixed; inset: 0; pointer-events: none; display: none; text-shadow: 0 1px 6px rgba(20, 60, 110, .55); }
+  #place { position: absolute; left: 28px; top: 22px; }
+  #place b { display: block; font-size: 26px; letter-spacing: 6px; font-weight: 700; }
+  #place span { display: block; font-size: 11px; letter-spacing: 4px; opacity: .9; margin-top: 4px; }
+  #place i { display: block; width: 46px; height: 3px; background: #ff7a9c; margin: 9px 0 0 2px; border-radius: 2px; }
+  #spot { position: absolute; left: 50%; top: 26px; transform: translateX(-50%); font-size: 15px; letter-spacing: 5px; opacity: 0; transition: opacity .6s; padding: 6px 18px; border-radius: 20px; background: rgba(40, 110, 190, .28); backdrop-filter: blur(4px); }
+  #keys { position: absolute; left: 20px; bottom: 16px; font-size: 12px; letter-spacing: 1.5px; line-height: 1.9; padding: 6px 12px; border-radius: 10px; background: rgba(30, 90, 170, .30); backdrop-filter: blur(4px); }
+  #keys kbd { display: inline-block; min-width: 22px; padding: 0 6px; margin-right: 4px; border: 1px solid rgba(255,255,255,.75); border-radius: 5px; text-align: center; font-family: inherit; font-size: 11px; background: rgba(40, 110, 190, .25); }
+  #dot { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: rgba(255,255,255,.85); box-shadow: 0 0 4px rgba(20,60,110,.6); }
+  #mode { position: absolute; right: 28px; top: 24px; font-size: 12px; letter-spacing: 3px; text-align: right; line-height: 1.8; }
+  .ov { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  #loading { background: linear-gradient(#3f8fe6, #bfe6fb 78%, #eaf7ff); z-index: 5; }
+  #loading h1, #title h1 { margin: 0; font-size: 58px; letter-spacing: 16px; font-weight: 700; text-shadow: 0 4px 22px rgba(20, 70, 140, .45); }
+  #loading p, #title p { margin: 12px 0 0; letter-spacing: 6px; font-size: 13px; opacity: .95; }
+  #bar { width: 240px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.35); margin-top: 34px; overflow: hidden; } #bar i { display: block; height: 100%; width: 0; background: #fff; transition: width .2s; }
+  #title { display: none; background: linear-gradient(rgba(30, 100, 190, .30), rgba(30, 100, 190, 0) 45%, rgba(20, 60, 120, .35)); cursor: pointer; z-index: 4; }
+  #title .go { margin-top: 44px; padding: 13px 44px; border: 2px solid #fff; border-radius: 30px; font-size: 16px; letter-spacing: 8px; background: rgba(255, 122, 156, .85); box-shadow: 0 6px 24px rgba(20, 60, 120, .35); }
+  #title small { margin-top: 26px; font-size: 12px; letter-spacing: 2px; opacity: .92; line-height: 2; text-shadow: 0 1px 6px rgba(20, 60, 110, .7); }
+  #touch { position: fixed; inset: 0; display: none; }
+  #stick { position: absolute; width: 120px; height: 120px; margin: -60px; border-radius: 50%; border: 2px solid rgba(255,255,255,.6); background: rgba(255,255,255,.12); display: none; }
+  #stick i { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px; border-radius: 50%; background: rgba(255,255,255,.75); }
+  #touch button { position: absolute; right: 26px; width: 64px; height: 64px; border-radius: 50%; border: 2px solid rgba(255,255,255,.8); background: rgba(40,110,190,.35); color: #fff; font-size: 14px; letter-spacing: 1px; }
+  #touch button[data-b=jump] { bottom: 30px; } #touch button[data-b=run] { bottom: 108px; } #touch button[data-b=fly] { bottom: 186px; }
+</style>
+<script type="importmap">{ "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" } }</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div id="place"><b>花城广场</b><span>ZHUJIANG NEW TOWN · GUANGZHOU</span><i></i></div>
+  <div id="spot"></div>
+  <div id="mode"></div>
+  <div id="dot"></div>
+  <div id="keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>走动　<kbd>Shift</kbd>跑　<kbd>空格</kbd>跳<br><kbd>F</kbd>飞行观光　<kbd>Q</kbd><kbd>E</kbd>飞行升降　<kbd>H</kbd>隐藏界面</div>
+</div>
+<div id="touch"><div id="stick"><i></i></div><button data-b="fly">飞行</button><button data-b="run">跑</button><button data-b="jump">跳</button></div>
+<div id="title" class="ov"><h1>花城漫步</h1><p>珠江新城 · 第一人称城市漫游</p><div class="go">开始漫步</div><small>鼠标转动视角 · WASD 走动 · Shift 跑 · F 飞行观光<br>沿中轴向南走，可以一路看到西塔、东塔和江对岸的广州塔</small></div>
+<div id="loading" class="ov"><h1>花城漫步</h1><p id="loadTxt">正在铺开城市…</p><div id="bar"><i id="loadBar"></i></div></div>
+<script type="module">import('./src/main.js');</script>
+</body>
+</html>

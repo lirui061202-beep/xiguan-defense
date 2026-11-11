@@ -7,14 +7,14 @@ http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
   if (req.method === 'POST' && url.pathname === '/__save') { // 素材预处理落盘（仅本地用，只允许写 assets/web 下的 webp）
     const rel = (url.searchParams.get('path') || '').split('\\').join('/');
-    if (!/^assets\/web\/[\w/-]+\.webp$/.test(rel) || rel.includes('..')) { res.writeHead(400); return res.end('bad path'); }
+    if (!/^(cbd\/)?assets\/web\/[\w/-]+\.webp$/.test(rel) || rel.includes('..')) { res.writeHead(400); return res.end('bad path'); }
     return body(req, (buf) => { const f = path.join(root, rel); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, buf); res.writeHead(200); res.end('ok'); });
   }
   if (req.method === 'POST' && url.pathname === '/__shot') { // 自测截图落盘（仅本地调试用）
     const name = (url.searchParams.get('name') || 'shot').replace(/[^a-zA-Z0-9_-]/g, '');
     return body(req, (buf) => { fs.mkdirSync(path.join(root, '_shots'), { recursive: true }); fs.writeFileSync(path.join(root, '_shots', name + '.jpg'), Buffer.from(buf.toString().split(',')[1], 'base64')); res.writeHead(200); res.end('ok'); });
   }
-  let p = decodeURIComponent(url.pathname); if (p === '/') p = '/index.html';
+  let p = decodeURIComponent(url.pathname); if (p.endsWith('/')) p += 'index.html';
   const f = path.join(root, path.normalize(p));
   if (!f.startsWith(root)) { res.writeHead(403); return res.end(); }
   fs.readFile(f, (e, d) => {

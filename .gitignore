@@ -4,3 +4,5 @@ _shots/
 .claude/
 *.log
 assets/tex/
+cbd/assets/gen/
+cbd/assets/src/
