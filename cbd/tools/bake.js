@@ -1,6 +1,6 @@
 // 素材预处理（在本地页面里跑）：cbd/assets/src/*.png → 缩放、压成 WebP → cbd/assets/web/
 // 用法：node server.js 后，在 http://localhost:5199/cbd/ 的控制台里： const m = await import('/cbd/tools/bake.js'); await m.bake();
-export const TABLE = { sky: [1774, 0.9], grass: [1024, 0.86], paving: [1024, 0.88], flowers: [1024, 0.86], posters: [1672, 0.88], shopsA: [1536, 0.88], shopsB: [1536, 0.88], curtain: [1024, 0.9], cladding: [1024, 0.9], asphalt: [1024, 0.88], sidewalk: [1024, 0.88], props1: [1254, 0.9], vend: [1536, 0.9], menu: [1536, 0.9] };
+export const TABLE = { sky: [1774, 0.9], grass: [1024, 0.86], paving: [1024, 0.88], flowers: [1024, 0.86], posters: [1672, 0.88], curtain: [1024, 0.9], cladding: [1024, 0.9], asphalt: [1024, 0.88], sidewalk: [1024, 0.88], props1: [1254, 0.9], vend: [1536, 0.9], menu: [1536, 0.9] };
 const load = (url) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('load ' + url)); i.src = url; });
 export async function bake(names = Object.keys(TABLE)) {
   const out = {};

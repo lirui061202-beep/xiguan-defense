@@ -49,8 +49,6 @@ export function buildCity(scene, tex) {
     lampGlow: new THREE.MeshBasicMaterial({ color: '#fff6dc' }), tower: std('#fbfaf6', 0.38, 0.1), core: lam('#8ec0e6'), pebbleA: lam('#e9e9e4', { flatShading: true }), pebbleB: lam('#4a4f58', { flatShading: true }),
   };
   // 裙楼底层的店面：两条手绘店面贴图轮流用，一条贴图 = 11 米宽 × 5.5 米高
-  const SHOP_H = 5.5, shopMats = ['shopsA', 'shopsB'].map((n) => { let t = tex[n]; if (!t && tex.shopsA) { t = tex.shopsA.clone(); t.needsUpdate = true; t.offset.x = 0.5; } if (!t) return glass('shop'); t.repeat.set(1 / 11, 1 / SHOP_H); return new THREE.MeshLambertMaterial({ map: t, emissive: '#ffffff', emissiveMap: t, emissiveIntensity: 0.22 }); });
-  let shopI = 0; const shopMat = () => shopMats[shopI++ % 2];
   if (tex.flowers) { const ft = tex.flowers.clone(); ft.needsUpdate = true; ft.repeat.set(1 / 3.2, 1 / 3.2); M.bloom = new THREE.MeshLambertMaterial({ map: ft }); } else M.bloom = M.hedge;
   const solid = (x0, x1, z0, z1, h = 400) => { colliders.push({ x0, x1, z0, z1 }); blockers.push({ x0, x1, z0, z1, y1: h }); };
   const plantQ = [];
@@ -135,7 +133,7 @@ export function buildCity(scene, tex) {
     if (!far) { if (!ch) ch = Math.min(w, d) * 0.08; if (crown === 'flat' && !steps.length && h > 100) steps = [{ y: h * 0.9, w: w * 0.84, d: d * 0.84 }, { y: h * 0.96, w: w * 0.64, d: d * 0.64 }]; }
     const bat = far ? NS : B, T = (g) => place(g, x, 0, z, ry);
     if (!far) {
-      bat.add(lobbyStyle === 'shop' ? shopMat() : glass(lobbyStyle), T(loft([{ y: 0, pts: rect(w - 1.4, d - 1.4, ch) }, { y: lobby, pts: rect(w - 1.4, d - 1.4, ch) }], { cap: false })));
+      bat.add(glass(lobbyStyle), T(loft([{ y: 0, pts: rect(w - 1.4, d - 1.4, ch) }, { y: lobby, pts: rect(w - 1.4, d - 1.4, ch) }], { cap: false })));
       bat.add(M.white, T(box(w + 3.5, 0.55, d + 3.5, 0, lobby, 0)));
       if (lobbyStyle === 'lobby' && lobby >= 8) ST.colonnade(x, z, w + 2.4, d + 2.4, lobby, ry);
     }
